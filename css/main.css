@@ -11,3 +11,30 @@ body {
     margin-right: 10px;
 }
 
+input[type="radio"] {
+	margin-left: 30px;
+	margin-right: 5px;
+}
+
+form {
+	border: 1px solid #E0E0E0;
+	padding: 15px;
+}
+
+#namebox {
+	padding-bottom: 20px;
+}
+
+#commentbox {
+	padding-bottom: 10px;
+}
+
+#buttonspinner {
+	display: none;
+}
+
+#commentspinner {
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+}
