@@ -1,50 +1,74 @@
 "use strict";
 
-var parse = "https://api.parse.com/1/classes/";
+var parse = "https://api.parse.com/1/classes/comments";
 var appID = "nds0pUIxzvUALUX2bSTWMdIXo5KQpO8CWKbfIstK";
 var RESTAPIKey = "ZDUcfvmGBx8yOGFDSLrM9IACOShw5fJFY1fEFDbt";
 
-var submitbutton;
-var buttonspinner;
-var commentspinner;
+angular.module("CommentApp", [])
+	.config(function($httpProvider) {
+		$httpProvider.defaults.headers.common['X-Parse-Application-Id'] = appID;
+		$httpProvider.defaults.headers.common['X-Parse-REST-Api-Key'] = RESTAPIKey;
+	})
+	.controller("CommentController", function($scope, $http) {
+		$scope.refreshComments = function() {
+			$scope.loading = true;
+			$http.get(parse + "?order=-score")
+				.success(function(responseData) {
+					$scope.comments = responseData.results;
+					console.log($scope.comments);
+				})
+				.error(function(err) {
+					console.log($scope.tasks);
+				})
+				.finally(function() {
+					$scope.loading = false;
+					$scope.voted = false;
+				});
+		};
 
-function onReady() {
-	document.getElementById("radio5").checked = true;
+		$scope.refreshComments();
 
-	submitbutton = document.getElementById("submit-button");
-	buttonspinner = document.getElementById("buttonspinner");
-	commentspinner = document.getElementById("commentspinner");
-} //onReady
+		$scope.newComment = {score: 0};
 
-function onSubmit() {
-	var rating = findRadioValue();
+		$scope.addComment = function(comment) {
+			//all fields required
+			if (comment.rating == undefined || comment.name == undefined ||
+				comment.title == undefined || comment.comment == undefined) {
+				return;
+			}
 
-	var name = document.getElementById("name").value;
-	if (name.trim().length == 0) {
-		return;
-	}
+			$http.post(parse, comment)
+				.success(function(responseData) {
+					comment.objectId = responseData.objectId;
+					$scope.comments.push(comment);
+					$scope.newComment = {score: 0};
+				});
+		};
 
-	var title = document.getElementById("title").value;
-	if (title.trim().length == 0) {
-		return;
-	}
+		$scope.updateComment = function(comment) {
+			$http.delete(parse + '/' + comment.objectId)
+				.success(function(responseData) {
+					$scope.refreshComments();
+				})
+				.error(function(err) {
+					console.log(err);
+				});
+		};
 
-	var comment = document.getElementById("comment").value;
-	if (comment.trim().length == 0) {
-		return;
-	}
+		$scope.updateScore = function(comment, num) {
+			//score cannot go below 0
+			if (comment.score == 0 && num == -1) {
+				return;
+			}
 
-	submitbutton.style.display = "none";
-	buttonspinner.style.display = "initial";
-} //onSubmit
+			$scope.voted = true;
 
-function findRadioValue() {
-	var radios = document.getElementsByName("rating");
-	for (var i = 0; i < radios.length; i++) {
-		if (radios[i].checked) {
-			return radios[i].value;
-		}
-	}
-} //finRadioValue
-
-document.addEventListener('DOMContentLoaded', onReady);
+			comment.score = comment.score + num;
+			$http.put(parse + '/' + comment.objectId, comment)
+				.success(function(responseData) {
+				})
+				.error(function(err) {
+					console.log(err);
+				});
+		};
+	});	

@@ -9,45 +9,52 @@
     </head>
     <body>
 
-        <main class="container">
+        <main class="container" ng-app="CommentApp" ng-controller="CommentController">
             <section>
                 <img src="img/super-bass-o-matic-76.jpg" alt="product picture" class="product-picture">
                 <h1>The Super Bass-o-Matic '76</h1>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia cumque deserunt ullam repudiandae nisi corporis! Ipsum, ducimus commodi, itaque porro distinctio consequuntur! Autem doloremque numquam nemo ex nulla tempora quis! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Unde nihil doloribus excepturi quisquam error possimus veritatis facere, commodi cumque ab atque dolore ducimus obcaecati ipsa, impedit! Consequuntur, eligendi iure cumque!</p>
             </section>
-
             <section>
                 <h2>Add a Comment</h2>
-                <form id="comment-form" method="POST" role="form">
+                <form ng-submit="addComment(newComment)">
                     <div class="form-group">
                         <label for="rating">Rating</label>
-                        <input type="radio" name="rating" value="1">1</input>
-                        <input type="radio" name="rating" value="2">2</input>
-                        <input type="radio" name="rating" value="3">3</input>
-                        <input type="radio" name="rating" value="4">4</input>
-                        <input type="radio" name="rating" value="5" id="radio5">5</input>
+                        <input type="radio" name="rating" ng-model="newComment.rating" value="1">1</input>
+                        <input type="radio" name="rating" ng-model="newComment.rating" value="2">2</input>
+                        <input type="radio" name="rating" ng-model="newComment.rating" value="3">3</input>
+                        <input type="radio" name="rating" ng-model="newComment.rating" value="4">4</input>
+                        <input type="radio" name="rating" ng-model="newComment.rating" value="5" id="radio5">5</input>
                     </div>
                     <div class="form-group" id="namebox">
-                        <input type="text" id="name" name="name" placeholder="Name" class="form-control"></input>
+                        <input type="text" placeholder="Name" class="form-control" ng-model="newComment.name" ></input>
                     </div>
                     <div class="form-group">
-                        <input type="text" id="title" name="title" placeholder="Title" class="form-control"></input>
+                        <input type="text" placeholder="Title" class="form-control" ng-model="newComment.title"></input>
                     </div>
                     <div class="form-group" id="commentbox">
-                        <input type="text" id="comment" name="comment" placeholder="Comment" class="form-control"></input>
+                        <input type="text" placeholder="Comment" class="form-control" ng-model="newComment.comment"></input>
                     </div>
-                    <button type="button" class="btn btn-primary" id="submit-button" onclick="onSubmit()">Submit Comment</button>
-                    <img src="img/ajax-spinner-sm.gif" alt="spinner" id="buttonspinner"></img>
+                    <button type="submit" class="btn btn-primary" ng-disabled="loading">Submit</button>
                 </form>
             </section>
 
             <section>
                 <h2>Comments</h2>
-                <section id="comments">
-                    <img src="img/ajax-spinner.gif" alt="spinner" id="commentspinner"></img>
+                <section id="commentSection">
+                    <img src="img/ajax-spinner.gif" alt="loading animation" ng-if="loading" id="commentspinner"></img>
+                    <ul ng-repeat="comment in comments">
+                        <p id="title"><b>{{comment.title}}</b></p>
+                        <p id="comment">{{comment.comment}}</p><br>
+                        <p id="name">{{comment.name}}</p>
+                        <p id="rating">Rating: <b>{{comment.rating}}</b></p>
+                        <p id="score">Comment score: <b>{{comment.score}}</b></p>
+                        <button type="button" class="btn btn-primary" ng-click="updateScore(comment, 1)" ng-disabled="voted">Vote Up</button>
+                        <button type="button" class="btn btn-primary" ng-click="updateScore(comment, -1)" ng-disabled="voted">Vote Down</button>
+                        <button type="button" class="btn btn-primary" ng-click="updateComment(comment)">Remove</button><br><br><br>
+                    </ul>
                 </section>
             </section>
-
         </main>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
